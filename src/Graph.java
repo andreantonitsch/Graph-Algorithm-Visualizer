@@ -11,7 +11,7 @@ import java.util.Stack;
 import java.util.Set;
 import java.util.PriorityQueue;
 
-public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGraph {
+public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGraph<N,E> {
     
     // Variables
     
@@ -50,7 +50,7 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         
         actions.add(new RunnableAction("Dijkstra",
                                        "Finds the shortest path between a nodes and every other one in the graph",
-                                        new Class<?>[] { this.getClass().getTypeParameters()[0].getClass() } ));
+                                        new ParameterType[] { ParameterType.NODE } ));
     
         return actions;
         
@@ -58,7 +58,31 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
 
     @Override
     public void runAction(RunnableAction r, Object... params) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+        // Check parameters
+        
+        ParameterType[] types = r.getParameters();
+        
+        for (int i = 0; i < types.length; i++) {
+            
+            //if (types[i] == ParameterType.NODE && !(params[i] instanceof N)) {}
+            
+        }
+        
+        // Run action
+        
+        switch (r.getName()) {
+            
+            case "Dijkstra":
+                
+                // Check parameters
+                
+                // 
+                
+                break;
+            
+        }
+    
     }
     
     // </editor-fold>
@@ -149,6 +173,8 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         int id = getId();
         int vc = getVerificationCode();
         Node n = new Node(value, id, vc);
+        
+        System.out.println(n.value.getClass());
         
         nodes.put(value, n);
         nodeIds.put(n.id, n);

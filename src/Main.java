@@ -4,7 +4,9 @@ public class Main {
         
         Graph<String, Integer> g = new Graph<>();
         
-        for (ObservableGraph.RunnableAction a : g.getActions()) {
+        g.addNode("Teste");
+        
+        for (RunnableAction a : g.getActions()) {
             
             System.out.println(a.parameters[0]);
             

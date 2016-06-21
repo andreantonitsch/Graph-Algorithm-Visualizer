@@ -1,6 +1,6 @@
 import java.util.List;
 
-public interface ObservableGraph {
+public interface ObservableGraph<N,E extends Comparable> {
     
     // Observer/Observable
     
@@ -8,53 +8,18 @@ public interface ObservableGraph {
     
     public void removeObserver(GraphObserver g);
     
-    public interface GraphObserver {
-        
-        public void update();
-        
-    }
-    
     // Runnable Actions
     
     public List<RunnableAction> getActions();
     
     public void runAction(RunnableAction r, Object... params);
     
-    public class RunnableAction {
-        
-        String name, description;
-        Class<?>[] parameters;
-        
-        // Getters
-        
-        public String getName() {
-            
-            return name;
-            
-        }
-        
-        public String getDescription() {
-            
-            return description;
-            
-        }
-        
-        public Class<?>[] getParameters() {
-            
-            return parameters;
-            
-        }
-        
-        // Constructor
-        
-        public RunnableAction(String name, String description, Class<?>[] parameters) {
-            
-            this.name = name;
-            this.description = description;
-            this.parameters = parameters;
-            
-        }
-        
-    }
+    // Communication
+    
+    public N stringToNode(String node);
+    
+    public String nodeToString(N node);
+    
+    public void addNode(String node);
     
 }
