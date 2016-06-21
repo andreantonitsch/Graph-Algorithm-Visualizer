@@ -1,3 +1,5 @@
+package Logic;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,29 +59,68 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     }
 
     @Override
-    public void runAction(RunnableAction r, Object... params) {
+    public void runAction(RunnableAction r, String... params) throws Exception {
     
-        // Check parameters
-        
-        ParameterType[] types = r.getParameters();
-        
-        for (int i = 0; i < types.length; i++) {
-            
-            //if (types[i] == ParameterType.NODE && !(params[i] instanceof N)) {}
-            
-        }
-        
-        // Run action
+        if (params.length < r.getParameters().length) { throw new IllegalArgumentException("Invalid number of parameters!"); }
         
         switch (r.getName()) {
             
+            // <editor-fold desc="Dijkstra">
+            
             case "Dijkstra":
                 
-                // Check parameters
+                N n1 = stringToNode(params[0]);
                 
-                // 
+                try {
+                    
+                    dijkstraPaths(n1);
+                    
+                }
+                catch (Exception e) {
+                    
+                    throw new Exception("Error processing algorithm!");
+                    
+                }
                 
                 break;
+                
+            // </editor-fold>
+            
+        }
+    
+    }
+
+    @Override
+    public N stringToNode(String node) {
+    
+        try {
+            
+            int id = Integer.parseInt(node);
+            Node n = nodeIds.get(id);
+            
+            return n.value;
+            
+        }
+        catch (Exception e) {
+            
+            return null;
+            
+        }
+    
+    }
+
+    @Override
+    public String nodeToString(N node) {
+    
+        try {
+            
+            Node n = getNode(node);
+            return n.id + "";
+            
+        }
+        catch (Exception e) {
+            
+            return "";
             
         }
     
@@ -173,8 +214,6 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         int id = getId();
         int vc = getVerificationCode();
         Node n = new Node(value, id, vc);
-        
-        System.out.println(n.value.getClass());
         
         nodes.put(value, n);
         nodeIds.put(n.id, n);

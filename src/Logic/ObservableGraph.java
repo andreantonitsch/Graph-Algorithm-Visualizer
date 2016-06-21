@@ -1,3 +1,5 @@
+package Logic;
+
 import java.util.List;
 
 public interface ObservableGraph<N,E extends Comparable> {
@@ -12,14 +14,12 @@ public interface ObservableGraph<N,E extends Comparable> {
     
     public List<RunnableAction> getActions();
     
-    public void runAction(RunnableAction r, Object... params);
+    public void runAction(RunnableAction r, String... params) throws Exception;
     
     // Communication
     
     public N stringToNode(String node);
     
     public String nodeToString(N node);
-    
-    public void addNode(String node);
     
 }
