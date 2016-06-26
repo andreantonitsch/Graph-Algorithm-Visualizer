@@ -6,7 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 
 public class TextNode extends CircleNode {
-    
+
     String text;
     
     public TextNode(String text) {
@@ -34,6 +34,13 @@ public class TextNode extends CircleNode {
         double y = getBounds().getY() + (getBounds().getHeight()/2) + (fm.getHeight()/4);
         
         g2.drawString(text, (int)(x), (int)(y));
+        
+    }
+    
+    public void setPainted(boolean painted) {
+        
+        if (painted) super.setColor(Color.GREEN);
+        else super.setColor(Color.WHITE);
         
     }
     

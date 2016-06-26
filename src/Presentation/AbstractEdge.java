@@ -52,13 +52,11 @@ public abstract class AbstractEdge implements Edge
    {
       Rectangle2D startBounds = start.getBounds();
       Rectangle2D endBounds = end.getBounds();
-      Point2D startCenter = new Point2D.Double(
-            startBounds.getCenterX(), startBounds.getCenterY());
-      Point2D endCenter = new Point2D.Double(
-            endBounds.getCenterX(), endBounds.getCenterY());
-      return new Line2D.Double(
-            start.getConnectionPoint(endCenter),
-            end.getConnectionPoint(startCenter));
+      
+      Point2D startCenter = new Point2D.Double(startBounds.getCenterX(), startBounds.getCenterY());
+      Point2D endCenter = new Point2D.Double(endBounds.getCenterX(), endBounds.getCenterY());
+      
+      return new Line2D.Double(start.getConnectionPoint(endCenter), end.getConnectionPoint(startCenter));
    }
 
     public double angle()

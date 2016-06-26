@@ -2,7 +2,7 @@ package Logic;
 
 import java.util.List;
 
-public interface ObservableGraph<N,E extends Comparable> {
+public interface ObservableGraph<N,E> {
     
     // Observer/Observable
     
@@ -18,8 +18,12 @@ public interface ObservableGraph<N,E extends Comparable> {
     
     // Communication
     
-    public N stringToNode(String node);
+    public String addNode(String node);
     
-    public String nodeToString(N node);
+    public boolean removeNode(String node);
     
+    public String addEdge(String from, String to, String label);
+    
+    public boolean removeEdge(String from, String to, String label);
+            
 }

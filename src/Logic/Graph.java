@@ -13,7 +13,7 @@ import java.util.Stack;
 import java.util.Set;
 import java.util.PriorityQueue;
 
-public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGraph<N,E> {
+public class Graph<N extends Comparable,E extends Comparable> implements Iterable<N>, ObservableGraph<N,E> {
     
     // Variables
     
@@ -28,6 +28,80 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     // <editor-fold desc="Observable Graph">
     
     List<GraphObserver> observers;
+    
+    private String getStringFromNode(Node node) {
+        
+        return node.id + node.value.toString() + node.verification_code;
+        
+    }
+    
+    private N getNodeFromString(String node) {
+        
+        try {
+            
+            N value = (N) node;
+            return value;
+            
+        }
+        catch (ClassCastException e) {
+            
+            // String is not the type of the N
+            
+        }
+        
+        try {
+            
+            Integer i = Integer.parseInt(node);
+            N value = (N) i;
+            return value;
+            
+        }
+        catch (ClassCastException e) {
+            
+            // Integer is not the type of the N
+            
+        }
+        
+        return null;
+        
+    }
+    
+    private String getStringFromEdge(Edge edge) {
+        
+        return edge.fromVC + edge.label.toString() + edge.toVC;
+        
+    }
+    
+    private E getEdgeFromString(String edge) {
+        
+        try {
+            
+            E value = (E) edge;
+            return value;
+            
+        }
+        catch (ClassCastException e) {
+            
+            // String is not the type of the N
+            
+        }
+        
+        try {
+            
+            Integer i = Integer.parseInt(edge);
+            E value = (E) i;
+            return value;
+            
+        }
+        catch (ClassCastException e) {
+            
+            // Integer is not the type of the N
+            
+        }
+        
+        return null;
+        
+    }
     
     @Override
     public void addObserver(GraphObserver g) {
@@ -45,6 +119,16 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     
     }
 
+    private void action(Report r) {
+        
+        for (GraphObserver go : observers) {
+            
+            go.update(r);
+            
+        }
+        
+    }
+    
     @Override
     public List<RunnableAction> getActions() {
     
@@ -52,8 +136,20 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         
         actions.add(new RunnableAction("Dijkstra",
                                        "Finds the shortest path between a nodes and every other one in the graph",
-                                        new ParameterType[] { ParameterType.NODE } ));
+                                        new ParameterType[] { ParameterType.NODE, ParameterType.NODE } ));
     
+        actions.add(new RunnableAction("Prim",
+                                       "Finds the minimum spanning tree for the current graph",
+                                       new ParameterType[] {}));
+        
+        actions.add(new RunnableAction("Critical Path",
+                                       "Finds the critical path",
+                                       new ParameterType[] { ParameterType.NODE }));
+        
+        actions.add(new RunnableAction("Topological Order",
+                                       "Order the nodes",
+                                       new ParameterType[] {}));
+        
         return actions;
         
     }
@@ -61,7 +157,7 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     @Override
     public void runAction(RunnableAction r, String... params) throws Exception {
     
-        if (params.length < r.getParameters().length) { throw new IllegalArgumentException("Invalid number of parameters!"); }
+        if (params.length != r.getParameters().length) { throw new IllegalArgumentException("Invalid number of parameters!"); }
         
         switch (r.getName()) {
             
@@ -69,16 +165,40 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
             
             case "Dijkstra":
                 
-                N n1 = stringToNode(params[0]);
+                N n1 = getNodeFromString(params[0]);
+                N n2 = getNodeFromString(params[1]);
+                
+                if (n1 == null || n2 == null) throw new IllegalArgumentException();
                 
                 try {
                     
-                    dijkstraPaths(n1);
+                    dijkstraPaths(n1, n2);
                     
                 }
                 catch (Exception e) {
                     
-                    throw new Exception("Error processing algorithm!");
+                    System.out.println(e.getClass() + " " + e.getMessage());
+                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    
+                }
+                
+                break;
+                
+            // </editor-fold>
+                
+            // <editor-fold desc="Prim">
+            
+            case "Prim":
+                
+                try {
+                    
+                    PrimMST();
+                    
+                }
+                catch (Exception e) {
+                    
+                    System.out.println(e.getClass() + " " + e.getMessage());
+                    throw new Exception("Error processing algorithm!" + e.getMessage());
                     
                 }
                 
@@ -86,46 +206,110 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
                 
             // </editor-fold>
             
+            // <editor-fold desc="Critical Path">
+            
+            case "Critical Path":
+                
+                N n = getNodeFromString(params[0]);
+                
+                if (n == null) throw new IllegalArgumentException();
+                
+                try {
+                    
+                    CriticalPath(n);
+                    
+                }
+                catch (Exception e) {
+                    
+                    System.out.println(e.getClass() + " " + e.getMessage());
+                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    
+                }
+                
+                break;
+                
+            // </editor-fold>
+            
+            // <editor-fold desc="Topological Order">
+            
+            case "Topological Order":
+                
+                try {
+                    
+                    TopologicOrder();
+                    
+                }
+                catch (Exception e) {
+                    
+                    System.out.println(e.getClass() + " " + e.getMessage());
+                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    
+                }
+                
+                break;
+                
+            // </editor-fold>
+                
         }
     
     }
 
     @Override
-    public N stringToNode(String node) {
+    public String addNode(String node) {
     
-        try {
+        N n = getNodeFromString(node);
+        
+        if (n != null) { 
+            Node nNode = addNode2(n); 
             
-            int id = Integer.parseInt(node);
-            Node n = nodeIds.get(id);
-            
-            return n.value;
-            
+            if (nNode != null) 
+                return getStringFromNode(nNode); 
+        
         }
-        catch (Exception e) {
-            
-            return null;
-            
-        }
+        
+        return null;
+        
+    }
+
+    @Override
+    public boolean removeNode(String node) {
+    
+        N n = getNodeFromString(node);
+        if (n != null) { removeNode(n); return true; }
+        return false;
+        
+    }
+
+    @Override
+    public String addEdge(String from, String to, String label) {
+    
+        N n1 = getNodeFromString(from);
+        N n2 = getNodeFromString(to);
+        E e1 = getEdgeFromString(label);
+
+        if (n1 == null || n2 == null || e1 == null) return null;
+        
+        Edge e = addEdge2(n1, n2, e1);
+        
+        return getStringFromEdge(e);
     
     }
 
     @Override
-    public String nodeToString(N node) {
+    public boolean removeEdge(String from, String to, String label) {
     
-        try {
-            
-            Node n = getNode(node);
-            return n.id + "";
-            
-        }
-        catch (Exception e) {
-            
-            return "";
-            
-        }
-    
+        N n1 = getNodeFromString(from);
+        N n2 = getNodeFromString(to);
+        E e1 = getEdgeFromString(label);
+        
+        if (n1 == null || n2 == null || e1 == null) return false;
+        
+        removeEdge(n1, n2, e1);
+        
+        return true;
+        
     }
-    
+
     // </editor-fold>
     
     // <editor-fold desc="Old">
@@ -146,6 +330,13 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
             
         }
         
+        @Override
+        public String toString() {
+            
+            return value.toString();
+            
+        }
+        
     }
     
     // Edge class
@@ -153,12 +344,16 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     class Edge {
         
         E label;
-        int fromVC, toVC;
+        int fromId, toId, fromVC, toVC;
         
-        public Edge(int fromvc, int tovc, E label) {
+        public Edge(Node from, Node to, E label) {
             
-            this.fromVC = fromvc;
-            this.toVC = tovc;
+            this.fromId = from.id;
+            this.fromVC = from.verification_code;
+            
+            this.toId = to.id;
+            this.toVC = to.verification_code;
+
             this.label = label;
             
         }
@@ -209,7 +404,14 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     
     public boolean addNode(N value) {
         
-        if (nodes.containsKey(value)) return false;
+        Node n = addNode2(value);
+        return n != null;
+        
+    }
+    
+    private Node addNode2(N value) {
+        
+        if (nodes.containsKey(value)) return null;
         
         int id = getId();
         int vc = getVerificationCode();
@@ -218,7 +420,7 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         nodes.put(value, n);
         nodeIds.put(n.id, n);
         
-        return true;
+        return n;
         
     }
     
@@ -265,19 +467,35 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         return e;
         
     }
+    
     private Double getEdgeValue(Edge e) {
         
-        if (e.label instanceof Number) {
+        return getEdgeValue(e.label);
+        
+    }
+    private Double getEdgeValue(E e) {
+        
+        if (e instanceof Number) {
             
-            Number n = (Number) e.label;
+            Number n = (Number) e;
             return n.doubleValue();
             
         }
         
-        if (e.label instanceof String) {
+        if (e instanceof String) {
             
-            String s = (String) e.label;
-            return s.length() + 0.0;
+            try {
+                
+                int i = Integer.parseInt((String)e);
+                return i + 0.0;
+                
+            }
+            catch (Exception ex) {
+                             
+                String s = (String) e;
+                return s.length() + 0.0;
+                
+            }
             
         }
         
@@ -289,13 +507,22 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
     
     public boolean addEdge(N from, N to, E label) {
         
+        Edge e = addEdge2(from, to, label);
+        return e != null;
+        
+    }
+    private Edge addEdge2(N from, N to, E label) {
+        
         Node nFrom = nodes.get(from);
         Node nTo   = nodes.get(to);
         
-        Edge e = new Edge(nFrom.verification_code, nTo.verification_code, label);
+        String edgeCode = getEdgeCode(nFrom.id, nTo.id);
+        if (edges.containsKey(edgeCode)) return null;
+        
+        Edge e = new Edge(nFrom, nTo, label);
         edges.put(getEdgeCode(nFrom.id, nTo.id), e);
         
-        return true;
+        return e;
         
     } 
     
@@ -345,42 +572,44 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
             
         }
         
+        auxList.sort((Node o1, Node o2) -> {
+            
+            Edge e1 = getEdge(from, o1);
+            Edge e2 = getEdge(from, o2);
+            
+            return getEdgeValue(e2).compareTo(getEdgeValue(e1));
+            
+        });
+        
         return auxList;
     }
     
     // Dijkstra 
     
-    public N[] dijkstraPaths(N origin) throws Exception {
+    public Map<N, Double> dijkstraPaths(N origin, N destination) throws Exception {
         
         // Get Origin
         
         Node norigin = getNode(origin);
-        if (norigin == null) throw new Exception("Invalid Input");
+        Node ndest = getNode(destination);
+        if (norigin == null || ndest == null) throw new Exception("Invalid Input");
         
         // Declare variables
         
-        Set<Node> evaluated;
-        PriorityQueue<Node> pqnodes;
-        Map<N, N> paths = new HashMap<>(nodes.size());
+        Set<Node> evaluated = new HashSet<>();
+        Map<Node, Node> paths = new HashMap<>(nodes.size());
         Map<Node, Double> path_sizes = new HashMap<>(nodes.size());
-        
-        // Create set
-        
-        evaluated = new HashSet<>();
-        
+
         // Create priority queue
         
-        pqnodes = new PriorityQueue<>(nodes.size(), new Comparator<Node>() {
+        PriorityQueue<Node> pqnodes = new PriorityQueue<>(nodes.size(), (Node o1, Node o2) -> {
             
-            @Override
-            public int compare(Node o1, Node o2) { 
-                
-                Double o1_size = path_sizes.get(o1);
-                Double o2_size = path_sizes.get(o2);
-                
-                return o1_size.compareTo(o2_size); 
+            Double o1_size = path_sizes.get(o1);
+            Double o2_size = path_sizes.get(o2);
             
-            }
+            int result = o1_size.compareTo(o2_size);
+
+            return result;
             
         });
         
@@ -388,9 +617,10 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         
         for (Node n : nodes.values()) {
             
-            if (n.equals(norigin)) path_sizes.put(n, 0.0);
+            if (n == norigin) path_sizes.put(n, 0.0);
             else path_sizes.put(n, Double.POSITIVE_INFINITY);
             pqnodes.offer(n);
+            paths.put(n, n);
             
         }
         
@@ -398,12 +628,22 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
         
         while (!pqnodes.isEmpty()) {
             
-            Node current = pqnodes.poll();
+            Node current = pqnodes.peek();
             evaluated.add(current);
             
-            ArrayList<Node> neighbours = getNeighboursNode(current);
-            neighbours.removeIf(n -> evaluated.contains(n));
+            action(new Report(Report.ACTION_PAINT,
+                          new String[] { getStringFromNode(current) },
+                          new String[] {}));
             
+            ArrayList<Node> neighbours = getNeighboursNode(current);
+            
+            for (int i = neighbours.size() - 1; i >= 0; i--) {
+                
+                Node n = neighbours.get(i);
+                if (evaluated.contains(n)) { neighbours.remove(i); }
+                
+            }
+
             for (Node n : neighbours) {
                 
                 // Get size from current to n
@@ -416,20 +656,110 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
                 if ((path_sizes.get(current) + value) < path_sizes.get(n)) {
                     
                     path_sizes.put(n, path_sizes.get(current) + value);
+                    paths.put(n, current);
                     
                 }
                 
             }
             
+            pqnodes.poll();
+            if (current == ndest) break;
+            
         }
+        
+        // Paint path
+        
+        Node aux = ndest;
+        ArrayList<String> path = new ArrayList<>();
+        
+        while (paths.get(aux) != aux) {
+            
+            Node aux2 = paths.get(aux);
+            Edge edge = getEdge(aux2, aux);
+   
+            path.add(getStringFromEdge(edge));
+            aux = aux2;
+            
+        }
+        
+        action(new Report(Report.ACTION_PAINT,
+                          new String[] {},
+                          path.toArray(new String[path.size()])));
+        
+        // Copy map to return
+        
+        Map<N, Double> pathsResult = new HashMap<>();
         
         for (Node n : path_sizes.keySet()) {
             
-            System.out.println("Path to " + n.value + " is: " + path_sizes.get(n));
+            pathsResult.put(n.value, path_sizes.get(n));
+
+        }
+        
+        return pathsResult;
+        
+    }
+    
+    // Constructor
+    
+    @Override
+    public String toString() {
+        
+        StringBuilder builder = new StringBuilder();
+        
+        for (Node n : nodes.values()) {
+            
+            builder.append(n.id);
+            builder.append(" ");
+            builder.append(n.value);
+            builder.append(" ");
+            builder.append(n.verification_code);
+            builder.append("\n");
             
         }
         
-        return null;
+        builder.append("\n");
+        
+        Object[] keyset  = edges.keySet().toArray();
+        
+        for (Object so : keyset) {
+            
+            String s = (String)so;
+            
+            int fromId = Integer.parseInt(s.split(",")[0]);
+            int toId = Integer.parseInt(s.split(",")[1]);
+            
+            Node from = nodeIds.get(fromId);
+            Node to   = nodeIds.get(toId);
+            
+            Edge e = getEdge(from, to);
+            if (e == null) continue;
+            
+            /*Edge e = edges.get(s);
+            if (!(e.fromVC == from.verification_code) || !(e.toVC == to.verification_code)) { continue; }*/
+            
+            builder.append(e.fromVC);
+            builder.append(" ");
+            builder.append(e.toVC);
+            builder.append(" ");
+            builder.append(e.label);
+            builder.append("\n");
+            
+        }
+        
+        return builder.toString();
+        
+    }
+    
+    public Graph() {
+        
+        nodes = new HashMap<>();
+        edges = new HashMap<>();
+        ids   = new Stack<>();
+        
+        nodeIds = new HashMap<>();
+        
+        ids.push(0);
         
     }
     
@@ -558,69 +888,309 @@ public class Graph<N,E extends Comparable> implements Iterable<N>, ObservableGra
 
     }
 
-    // Constructor
+    // Breadth-First Traversal Method (Atomic)
     
-    @Override
-    public String toString() {
+    public List<N> BreadthTraversal(N origin) {
         
-        StringBuilder builder = new StringBuilder();
+        ArrayList<N> traversal = new ArrayList<>();
         
-        for (Node n : nodes.values()) {
+        try {
             
-            builder.append(n.id);
-            builder.append(" ");
-            builder.append(n.value);
-            builder.append(" ");
-            builder.append(n.verification_code);
-            builder.append("\n");
+            setIterator(IteratorType.BREADTH, origin);
+            for (N data : this) traversal.add(data);
+            
+        }
+        catch (Exception e) {
+            
+            return null;
             
         }
         
-        builder.append("\n");
+        return traversal;
         
-        Object[] keyset  = edges.keySet().toArray();
+    }
+    
+    // Depth-First Traversal Method (Atomic)
+    
+    public List<N> DepthTraversal(N origin) {
         
-        for (Object so : keyset) {
+        ArrayList<N> traversal = new ArrayList<>();
+        
+        try {
             
-            String s = (String)so;
+            setIterator(IteratorType.DEPTH, origin);
+            for (N data : this) traversal.add(data);
             
-            int fromId = Integer.parseInt(s.split(",")[0]);
-            int toId = Integer.parseInt(s.split(",")[1]);
+        }
+        catch (Exception e) {
             
-            Node from = nodeIds.get(fromId);
-            Node to   = nodeIds.get(toId);
+            return null;
+            
+        }
+        
+        return traversal;
+        
+    }
+    
+    // Prim's Algorithm for MSTs
+    // Requires an undirected graph
+    
+    public Graph<N,E> PrimMST(){
+
+        HashMap<Node, E> cheapestCost = new HashMap<>();
+        HashMap<Node, Edge> father = new HashMap<>();
+        
+        HashSet<Node> newNodes = new  HashSet<>();
+        HashSet<Edge> newEdges = new  HashSet<>();
+        
+        PriorityQueue<Node> vertices = new PriorityQueue((Object o1, Object o2) -> {
+            
+            Node n1 = (Node)o1;
+            Node n2 = (Node)o2;
+            
+            E e1 = cheapestCost.get(n1);
+            E e2 = cheapestCost.get(n2);
+            
+            if (e1 == null && e2 == null) return 0;
+            if (e1 == null) return 1;
+            if (e2 == null) return -1;
+            
+            return cheapestCost.get(n1).compareTo(cheapestCost.get(n2));
+            
+        });
+        
+        for(Node n : nodes.values()){
+            
+            father.put(n, null);
+            cheapestCost.put(n, null);
+            vertices.offer(n);
+
+        }
+
+        while(!vertices.isEmpty()){
+        
+            Node n = vertices.peek();
+            
+            action(new Report(Report.ACTION_PAINT,
+                          new String[] { getStringFromNode(n) },
+                          new String[] {}));
+            
+            newNodes.add(n);
+
+            for(Node neighbour : getNeighboursNode(n)){
+            
+                if(vertices.contains(neighbour)){
+                    
+                    if((cheapestCost.get(neighbour)) == null || getEdgeValue(getEdge(n, neighbour)).compareTo(getEdgeValue(cheapestCost.get(neighbour))) < 0 ){
+
+                        cheapestCost.put(neighbour , getEdge(n, neighbour).label);
+                        father.put(neighbour, getEdge(n, neighbour));
+                    
+                    }  
+                        
+                }
+            
+            }
+            
+            if(father.containsKey(n)) {
+                
+                Edge e = father.get(n);
+                
+                if (e != null) {
+                    
+                    newEdges.add(e);
+                
+                    action(new Report(Report.ACTION_PAINT,
+                              new String[] {},
+                              new String[] { getStringFromEdge(e) }));
+
+                }
+                
+            }
+            
+            vertices.poll();
+        
+        }
+
+        Graph<N,E> return_graph = new Graph<>();
+        
+        for(Node n : newNodes) return_graph.addNode(n.value);
+        
+        for(Edge e : newEdges){
+            
+            Node toNode = nodeIds.get(e.toId);
+            Node fromNode = nodeIds.get(e.fromId);
+        
+            return_graph.addEdge(fromNode.value, toNode.value, e.label);
+        
+        }
+        
+        return return_graph;
+        
+    }
+    
+    // Topological Ordering
+    // Requires Acyclic directed graph
+    
+    public List<N> TopologicOrder(){
+    
+       ArrayList<N> return_list = new ArrayList<>();
+       ArrayList<Edge> aux_edges = new ArrayList(edges.values());
+       ArrayList<Node> aux_nodes = new ArrayList(nodes.values());
+       
+       while(!aux_nodes.isEmpty()){
+           
+           for(int i = 0; i < aux_nodes.size(); i++){
+           
+               Node n = aux_nodes.get(i);
+               
+                boolean node_with_no_parents_left = true;
+
+                for(Edge e : aux_edges){
+
+                    Node destination = nodeIds.get(e.toId);
+                    Node departure   = nodeIds.get(e.fromId);
+
+                    if(destination.value.equals(n.value) && aux_nodes.contains(departure))
+                        node_with_no_parents_left = false;
+
+                }
+
+                if(node_with_no_parents_left){
+                    
+                    return_list.add(n.value);
+                    aux_nodes.remove(n);
+                     
+                    action(new Report(Report.ACTION_PAINT,
+                          new String[] { getStringFromNode(n) },
+                          new String[] {}));
+                     
+                }
+                
+           }
+       
+       }
+       
+       return return_list;
+
+    }
+    
+    // Topological Ordering
+    // Requires Acyclic directed graph
+    
+    public Map<Integer, List<N>> TopologicOrderMap(){
+    
+       HashMap<Integer, List<N>> return_map = new HashMap<>();
+    
+       ArrayList<Edge> aux_edges = new ArrayList(edges.values());
+       
+       ArrayList<N> aux_nodes = new ArrayList(nodes.values());
+       
+       int classCount = 0;
+       
+       while(!aux_nodes.isEmpty()){
+           
+           ArrayList<N> class_list = new ArrayList<>();
+               
+           for(int i = 0; i < aux_nodes.size(); i++){
+           
+               N n = aux_nodes.get(i);
+               
+                boolean node_with_no_parents_left = true;
+
+                for(Edge e : aux_edges){
+
+                    Node destination = nodeIds.get(e.toVC);
+                    Node departure   = nodeIds.get(e.fromVC);
+
+                    if(destination.value.equals(n) && aux_nodes.contains(departure.value))
+                        node_with_no_parents_left = false;
+
+                }
+
+                if(node_with_no_parents_left){
+                     class_list.add(n);
+                     aux_nodes.remove(n);
+                }
+                
+           }
+           
+           return_map.put(classCount, class_list);
+           classCount++;
+       
+       }
+       
+       return return_map;
+
+    }
+       
+    //Critical Path
+    //Requires Acyclic directed graph
+    
+    public List<N> CriticalPath(N startingNode){
+    
+        Node currentNode = getNode(startingNode);
+        if (currentNode == null) return null;
+        
+        List<N> return_list = new ArrayList<>();
+        ArrayList<N> neighbours = getNeighbours(startingNode);
+        
+        while(neighbours.size() > 0){
+        
+            Node nn = currentNode;
+            
+            action(new Report(Report.ACTION_PAINT,
+                   new String[] { getStringFromNode(nn) },
+                   new String[] {}));
+            
+            N biggestNeighbour = neighbours.get(0);
+            for(N n : neighbours) if( n.compareTo(biggestNeighbour) > 0 ) biggestNeighbour = n;
+            
+            return_list.add(currentNode.value);
+            currentNode = getNode(biggestNeighbour);
+            
+            neighbours = getNeighbours(currentNode.value);
+       
+        }
+        
+        Node nn = currentNode;
+        
+        action(new Report(Report.ACTION_PAINT,
+                   new String[] { getStringFromNode(nn) },
+                   new String[] {}));
+        
+        return_list.add(currentNode.value);
+        
+        for (int i = 0; i < return_list.size() - 1; i++) {
+            
+            Node from = nodes.get(return_list.get(i));
+            Node to = nodes.get(return_list.get(i+1));
             
             Edge e = getEdge(from, to);
-            if (e == null) continue;
             
-            /*Edge e = edges.get(s);
-            if (!(e.fromVC == from.verification_code) || !(e.toVC == to.verification_code)) { continue; }*/
-            
-            builder.append(e.fromVC);
-            builder.append(" ");
-            builder.append(e.toVC);
-            builder.append(" ");
-            builder.append(e.label);
-            builder.append("\n");
+            action(new Report(Report.ACTION_PAINT,
+                   new String[] {},
+                   new String[] { getStringFromEdge(e) }));
             
         }
-        
-        return builder.toString();
-        
-    }
-    
-    public Graph() {
-        
-        nodes = new HashMap<>();
-        edges = new HashMap<>();
-        ids   = new Stack<>();
-        
-        nodeIds = new HashMap<>();
-        
-        ids.push(0);
+
+        return return_list;
         
     }
     
+    // Returns a possible Biggest value in the list.
+    // Assures nothing in the case of partial ordering.
+    
+    private N biggestN (ArrayList<N> nodes){
+    
+        N biggest = nodes.get(0);
+    
+        for(N n : nodes) if( n.compareTo(biggest) > 0 ) biggest = n;
+    
+        return biggest;
+        
+    }
+     
     // </editor-fold>
     
 }

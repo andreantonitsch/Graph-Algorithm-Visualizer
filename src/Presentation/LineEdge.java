@@ -9,11 +9,13 @@ import java.awt.geom.*;
 */
 public class LineEdge extends AbstractEdge
 {
+   @Override
    public void draw(Graphics2D g2)
    {
       g2.draw(getConnectionPoints());
    }
 
+   @Override
    public boolean contains(Point2D aPoint)
    {
        

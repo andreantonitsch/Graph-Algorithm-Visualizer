@@ -1,5 +1,6 @@
 package Presentation;
 
+import Logic.ObservableGraph;
 import javax.swing.*;
 
 /**
@@ -7,10 +8,12 @@ import javax.swing.*;
 */
 public class SimpleGraphEditor
 {
-   public static void main(String[] args)
-   {
+   public static void main(String[] args) {
        
-       JFrame frame = new GraphFrame(new Graph() {}, new Logic.Graph<String, Integer>());
+       Logic.Graph<String, Integer> g = new Logic.Graph<String, Integer>();
+       ObservableGraph<String, Integer> og = g;
+       
+       JFrame frame = new GraphFrame(new ObservableGraphBackedGraph(og));
        frame.setVisible(true);
       
    }
