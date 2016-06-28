@@ -5,6 +5,10 @@ import javax.swing.*;
 
 /**
    A program for editing UML diagrams.
+   
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
 */
 public class SimpleGraphEditor
 {

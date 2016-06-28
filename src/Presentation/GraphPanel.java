@@ -7,6 +7,13 @@ import java.util.Observable;
 import java.util.Observer;
 import javax.swing.*;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public class GraphPanel extends JComponent implements Observer {
 
     // Static

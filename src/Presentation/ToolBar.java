@@ -9,6 +9,13 @@ import java.util.*;
 import javax.swing.*;
 
 /**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
+/**
    A tool bar that contains node and edge prototype icons.
    Exactly one icon is selected at any time.
 */

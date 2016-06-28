@@ -6,6 +6,13 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public abstract class Graph extends Observable implements Serializable {
 
     protected final Map<String, Node> id_node;

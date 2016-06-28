@@ -11,6 +11,13 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public class TextEdge extends LineEdge {
     
     boolean painted;

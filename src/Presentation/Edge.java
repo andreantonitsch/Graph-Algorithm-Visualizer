@@ -5,6 +5,13 @@ import java.awt.geom.*;
 import java.io.*;
 
 /**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
+/**
    An edge in a graph.
 */
 public interface Edge extends Serializable, Cloneable

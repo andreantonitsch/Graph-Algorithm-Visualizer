@@ -5,6 +5,13 @@ import java.awt.*;
 import java.awt.geom.*;
 
 /**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
+/**
    A circular node that is filled with a color.
 */
 public class CircleNode implements Node

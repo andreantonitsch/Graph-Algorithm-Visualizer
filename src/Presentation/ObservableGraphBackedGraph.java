@@ -6,6 +6,13 @@ import Logic.Report;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public class ObservableGraphBackedGraph extends Graph implements GraphObserver {
     
     // Variables

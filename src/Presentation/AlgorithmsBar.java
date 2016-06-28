@@ -10,6 +10,13 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public class AlgorithmsBar extends JPanel implements Observer {
     
     JButton nextR, prevR;

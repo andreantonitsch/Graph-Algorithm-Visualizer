@@ -3,6 +3,13 @@ package Presentation;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
 public class GraphFrame extends JFrame
 {
     private final Graph graph;

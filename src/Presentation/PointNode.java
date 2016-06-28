@@ -5,6 +5,13 @@ import java.awt.*;
 import java.awt.geom.*;
 
 /**
+
+   Código da interface gráfica baseado no exercício disponibilizado aos alunos de
+   Técnicas de Programação pelo professor Júlio Machado
+   
+*/
+
+/**
    An inivisible node that is used in the toolbar to draw an
    edge.
 */

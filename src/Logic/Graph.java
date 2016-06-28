@@ -177,8 +177,7 @@ public class Graph<N extends Comparable,E extends Comparable> implements Iterabl
                 }
                 catch (Exception e) {
                     
-                    System.out.println(e.getClass() + " " + e.getMessage());
-                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    throw new Exception("Error processing algorithm!");
                     
                 }
                 
@@ -197,8 +196,7 @@ public class Graph<N extends Comparable,E extends Comparable> implements Iterabl
                 }
                 catch (Exception e) {
                     
-                    System.out.println(e.getClass() + " " + e.getMessage());
-                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    throw new Exception("Error processing algorithm!");
                     
                 }
                 
@@ -221,8 +219,7 @@ public class Graph<N extends Comparable,E extends Comparable> implements Iterabl
                 }
                 catch (Exception e) {
                     
-                    System.out.println(e.getClass() + " " + e.getMessage());
-                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    throw new Exception("Error processing algorithm!");
                     
                 }
                 
@@ -241,8 +238,7 @@ public class Graph<N extends Comparable,E extends Comparable> implements Iterabl
                 }
                 catch (Exception e) {
                     
-                    System.out.println(e.getClass() + " " + e.getMessage());
-                    throw new Exception("Error processing algorithm!" + e.getMessage());
+                    throw new Exception("Error processing algorithm!");
                     
                 }
                 
@@ -288,6 +284,12 @@ public class Graph<N extends Comparable,E extends Comparable> implements Iterabl
         E e1 = getEdgeFromString(label);
 
         if (n1 == null || n2 == null || e1 == null) return null;
+        
+        Node nn1 = getNode(n1);
+        Node nn2 = getNode(n2);
+        
+        if (nn1 != null && nn2 != null)
+            if (getEdge(nn1, nn2) != null) return null;
         
         Edge e = addEdge2(n1, n2, e1);
         
